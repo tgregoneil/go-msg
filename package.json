@@ -10,13 +10,13 @@
   "author": "T. Greg O'Neil <go22.npm@gmail.com> (http://tgregoneil.com)",
   "license": "ISC",
   "readme": "readme.md",
-  "homepage": "https://github.com/tgregoneil/REPO",
+  "homepage": "https://github.com/tgregoneil/go-msg",
   "repository": {
-    "url": "git+ssh://github.com/tgregoneil/REPO.git",
+    "url": "git+ssh://github.com/tgregoneil/go-msg.git",
     "type": "git"
   },
   "dependencies": {},
   "bugs": {
-    "url": "https://github.com/tgregoneil/REPO/issues"
+    "url": "https://github.com/tgregoneil/go-msg/issues"
   }
 }
