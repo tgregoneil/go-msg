@@ -16,6 +16,10 @@ var v = {
         // to ensure that it will be treated as an attribute in case a primary is present
         // Secondary is only tested if there exists a primary key
 
+    meta: null,
+        // meta parameters intended for ctrl or other purpose outside of primary and secondary msg
+        // parameter usage
+
 };  // end PRIVATE properties
 
     // PRIVATE Functions
@@ -25,7 +29,8 @@ f = {};
 f.init = () => {
 
     v.primary = p0.primary;
-    v.secondary = p0.secondary;
+    v.secondary = p0.hasOwnProperty ('secondary') ? p0.secondary : {};
+    v.meta = p0.hasOwnProperty ('meta') ? p0.meta : {};
 };
 
     // PUBLIC Functions
@@ -39,13 +44,20 @@ P.parseMsg = (msgOb) => {
 
     var primaryCandidatesOb = {};
     var attrsOb = {};
+    var metaOb = {};
+
+    var key;
     for (var i = 0; i < msgKeys.length; i++) {
 
-        var key = msgKeys [i];
+        key = msgKeys [i];
         
         if (v.primary.hasOwnProperty (key)) {
 
             primaryCandidatesOb [key] = 1;
+
+        } else if (v.meta.hasOwnProperty (key)) {
+
+            metaOb [key] = msgOb [key];
 
         } else {
 
@@ -55,25 +67,24 @@ P.parseMsg = (msgOb) => {
         
     } // end for (var i = 0; i < msgKeys.length; i++)
 
-    var primaryCandidates = Object.keys (primaryCandidatesOb);
+    var primaryCandidatesA = Object.keys (primaryCandidatesOb);
 
-    if (primaryCandidates.length === 0) {
+    var primaryKey;
+    var content;
+
+    if (primaryCandidatesA.length === 0) {
 
         res.err = 'No primary candidates found in msgOb: ' + JSON.stringify (msgOb);
 
-    } else if (primaryCandidates.length === 1) {
+    } else if (primaryCandidatesA.length === 1) {
 
-        res.p = primaryCandidates [0];
-        res.c = v.primary [res.p] ? msgOb [res.p] : null;
-            // example void html tag has zero content, so res.c = null
+        primaryKey = primaryCandidatesA [0];
 
-        res.s = attrsOb;
-        
     } else {
         // handle primary/secondary key resolution
 
-        var primaryKey = null;
-        for (var key in primaryCandidatesOb) {
+        primaryKey = null;
+        for (key in primaryCandidatesOb) {
 
             if (v.secondary.hasOwnProperty (key)) {
 
@@ -94,18 +105,22 @@ P.parseMsg = (msgOb) => {
 
             } // end if (v.secondary.hasOwnProperty (key))
             
-        };
+        }
 
-        if (!res.hasOwnProperty ('err')) {
+    } // end if (primaryCandidatesA.length === 0)
 
-            res.p = primaryKey;
-            res.c = v.primary [primaryKey] ? msgOb [primaryKey] : null;
-            res.s = attrsOb;
 
-        } // end if (!res.hasOwnProperty ('err'))
-        
+    if (!res.hasOwnProperty ('err')) {
 
-    } // end if (primaryCandidates.length === 0)
+        res.p = primaryKey;
+        res.c = v.primary [primaryKey] !== 0 ? msgOb [primaryKey] : null;
+            // example void html tag has zero content, so content is forced to null
+
+        res.s = attrsOb;
+        res.m = metaOb;
+
+    } // end if (!res.hasOwnProperty ('err'))
+    
     
     return res;
 
