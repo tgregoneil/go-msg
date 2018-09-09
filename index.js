@@ -74,7 +74,7 @@ P.parseMsg = (msgOb) => {
 
     if (primaryCandidatesA.length === 0) {
 
-        res.err = 'No primary candidates found in msgOb: ' + JSON.stringify (msgOb);
+        primaryKey = null;
 
     } else if (primaryCandidatesA.length === 1) {
 
@@ -113,7 +113,7 @@ P.parseMsg = (msgOb) => {
     if (!res.hasOwnProperty ('err')) {
 
         res.p = primaryKey;
-        res.c = v.primary [primaryKey] !== 0 ? msgOb [primaryKey] : null;
+        res.c = primaryKey && v.primary [primaryKey] !== 0 ? msgOb [primaryKey] : null;
             // example void html tag has zero content, so content is forced to null
 
         res.s = attrsOb;
