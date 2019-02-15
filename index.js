@@ -69,21 +69,16 @@ P.parseMsg = (msgOb) => {
 
     var primaryCandidatesA = Object.keys (primaryCandidatesOb);
 
-    var primaryKey;
+    var primaryKey = null;
     var content;
 
-    if (primaryCandidatesA.length === 0) {
-
-        primaryKey = null;
-
-    } else if (primaryCandidatesA.length === 1) {
+    if (primaryCandidatesA.length === 1) {
 
         primaryKey = primaryCandidatesA [0];
 
     } else {
         // handle primary/secondary key resolution
 
-        primaryKey = null;
         for (key in primaryCandidatesOb) {
 
             if (v.secondary.hasOwnProperty (key)) {
@@ -98,7 +93,7 @@ P.parseMsg = (msgOb) => {
 
                 } else {
 
-                    res.err = 'Multiple primary keys found not in secondary object: ' + JSON.stringify (msg);
+                    res.err = 'Multiple primary keys found: ' + primaryKey + ',' + key + 'and possibly others. Original message\n'  + JSON.stringify (msg);
 
                 } // end if (primaryKey === null)
                 
@@ -108,6 +103,13 @@ P.parseMsg = (msgOb) => {
         }
 
     } // end if (primaryCandidatesA.length === 0)
+
+    if (primaryKey === null) {
+
+        res.err = 'Either there was no primary key or all primary candidates are members of secondary: ' + JSON.stringify (primaryCandidatesA);
+
+    } // end if (primaryKey === null)
+    
 
 
     if (!res.hasOwnProperty ('err')) {
