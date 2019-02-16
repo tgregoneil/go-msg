@@ -20,6 +20,9 @@ var v = {
         // meta parameters intended for ctrl or other purpose outside of primary and secondary msg
         // parameter usage
 
+    actions: null,
+        // actions, if provided are executed at the end of parseMsg
+
 };  // end PRIVATE properties
 
     // PRIVATE Functions
@@ -31,6 +34,9 @@ f.init = () => {
     v.primary = p0.primary;
     v.secondary = p0.hasOwnProperty ('secondary') ? p0.secondary : {};
     v.meta = p0.hasOwnProperty ('meta') ? p0.meta : {};
+
+        // actions fully belongs to go-msg, whereas primary, secondary and meta belong to the code using go-msg
+    v.actions = p0.hasOwnProperty ('actions') ? p0.actions : null;
 };
 
     // PUBLIC Functions
@@ -121,9 +127,16 @@ P.parseMsg = (msgOb) => {
         res.s = attrsOb;
         res.m = metaOb;
 
+        if (v.actions) {
+
+            v.actions [primaryKey] (res.c);
+
+        } // end if (v.actions)
+        
     } // end if (!res.hasOwnProperty ('err'))
     
     
+
     return res;
 
 }; // end P.parseMsg 
