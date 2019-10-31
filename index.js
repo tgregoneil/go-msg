@@ -4,8 +4,7 @@
 
 module.exports = function (p0) {
 
-    // PRIVATE Properties
-var v = {
+const v = {
 
     primary: null,
         // primary: {cmd: 1} (contains optional content) or {cmd: 0} (no optional content allowed)
@@ -20,40 +19,32 @@ var v = {
         // meta parameters intended for ctrl or other purpose outside of primary and secondary msg
         // parameter usage
 
-    actions: null,
-        // actions, if provided are executed at the end of parseMsg
+};  
 
-};  // end PRIVATE properties
-
-    // PRIVATE Functions
-f = {};
-
-
-f.init = () => {
+const A = {};
+//---------------------
+A.init = () => {
 
     v.primary = p0.primary;
     v.secondary = p0.hasOwnProperty ('secondary') ? p0.secondary : {};
     v.meta = p0.hasOwnProperty ('meta') ? p0.meta : {};
 
-        // actions fully belongs to go-msg, whereas primary, secondary and meta belong to the code using go-msg
-    v.actions = p0.hasOwnProperty ('actions') ? p0.actions : null;
-};
+}; // end A.init
 
-    // PUBLIC Functions
-var P = {};
 
+const P = {};
 //---------------------
 P.parseMsg = (msgOb) => {
     
-    var res = {};
-    var msgKeys = Object.keys (msgOb);
+    const res = {};
+    const msgKeys = Object.keys (msgOb);
 
-    var primaryCandidatesOb = {};
-    var attrsOb = {};
-    var metaOb = {};
+    const primaryCandidatesOb = {};
+    const attrsOb = {};
+    const metaOb = {};
 
-    var key;
-    for (var i = 0; i < msgKeys.length; i++) {
+    let key;
+    for (let i = 0; i < msgKeys.length; i++) {
 
         key = msgKeys [i];
         
@@ -71,12 +62,11 @@ P.parseMsg = (msgOb) => {
 
         } // end if (v.primary.hasOwnProperty (key))
         
-    } // end for (var i = 0; i < msgKeys.length; i++)
+    } // end for (let i = 0; i < msgKeys.length; i++)
 
-    var primaryCandidatesA = Object.keys (primaryCandidatesOb);
+    const primaryCandidatesA = Object.keys (primaryCandidatesOb);
 
-    var primaryKey = null;
-    var content;
+    let primaryKey = null;
 
     if (primaryCandidatesA.length === 1) {
 
@@ -118,34 +108,27 @@ P.parseMsg = (msgOb) => {
     
 
 
-    if (!res.hasOwnProperty ('err')) {
+    res.p = primaryKey;
+    res.c = primaryKey && v.primary [primaryKey] !== 0 ? msgOb [primaryKey] : null;
+        // example void html tag has zero content, so content is forced to null
 
-        res.p = primaryKey;
-        res.c = primaryKey && v.primary [primaryKey] !== 0 ? msgOb [primaryKey] : null;
-            // example void html tag has zero content, so content is forced to null
+    res.s = attrsOb;
+    res.m = metaOb;
 
-        res.s = attrsOb;
-        res.m = metaOb;
+    action = v.primary [primaryKey];
+    if (typeof action === 'function') {
 
-        if (v.actions) {
+        action (res);
 
-            v.actions [primaryKey] (res.c);
-
-        } // end if (v.actions)
+    } // end if (typeof action === 'function')
         
-    } // end if (!res.hasOwnProperty ('err'))
-    
-    
 
     return res;
 
 }; // end P.parseMsg 
 
 
-
-    // end PUBLIC Functions
-
-f.init ();
+A.init ();
 
 return P;
 
